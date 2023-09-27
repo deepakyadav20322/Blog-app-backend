@@ -6,7 +6,7 @@ const postSchema = new mongoose.Schema({
     required: true,
     trim: true,
   },
-  discription:{
+  description:{
     type: String,
     required: true,
     trim:true
@@ -26,35 +26,61 @@ const postSchema = new mongoose.Schema({
     type: String,
     trim: true,
   }],
-
-  likes: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User', // Reference to the User model for users who liked the post
-  }],
- 
-  comments: [{
-    commentText: {
-      type: String,
-      required: true,
-      trim:true,
-    },
-    author: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
-      required: true,
-    },
-    createdAt: {
-      type: Date,
-      default: Date.now,
-    },
-  }],
   viewCount: {
     type: Number,
     default: 0, 
   },
+  saveCount:{
+    type:Number,
+    default:0,
+  },
+  comments: [{
+      commentText: {
+        type: String,
+        trim:true,
+      },
+      author: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+      },
+      createdAt: {
+        type: Date,
+        default: Date.now,
+      },
+    }],
 },
 {timestamps:true});
 
 const Post = mongoose.model('Post', postSchema);
 
 module.exports = Post;
+
+
+
+
+
+
+// for letter use --------------------------
+
+
+// likes: [{
+//   type: mongoose.Schema.Types.ObjectId,
+//   ref: 'User', // Reference to the User model for users who liked the post
+// }],
+
+// comments: [{
+//   commentText: {
+//     type: String,
+//     required: true,
+//     trim:true,
+//   },
+//   author: {
+//     type: mongoose.Schema.Types.ObjectId,
+//     ref: 'User',
+//     required: true,
+//   },
+//   createdAt: {
+//     type: Date,
+//     default: Date.now,
+//   },
+// }],

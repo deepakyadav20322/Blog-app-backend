@@ -3,7 +3,7 @@ const secretkey = process.env.token_key;
 
 const tokenGenerate = async ({_id,fname,lname,bio,mob,email}) => {
   try {
-    const token = jwt.sign({id:_id,fname,lname,email,mob,bio},
+    const token = jwt.sign({_id:_id,fname,lname,email,mob,bio},
       secretkey
     );
     console.log("token is: ",token);

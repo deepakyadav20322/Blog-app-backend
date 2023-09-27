@@ -2,7 +2,7 @@ const jwt = require("jsonwebtoken");
 const auth = async (req,res,next)=>{
     try {
         //Extracting JWT token from request cookies,body or header
-        const token =  req.header("Authorization").split(" ")[1];
+        const token =  req.header("Authorization")?.split(" ")[1];
         // const token = req.body.token || req.cookie.token || req.header("Authorization").replace("Bearer ", "");
         if(!token){
             return res.status(401).json({message:"Token missing",success:false});

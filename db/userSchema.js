@@ -1,4 +1,6 @@
-const {Schema,model} = require('mongoose')
+const  {Schema,model} = require('mongoose');
+const  mongoose= require('mongoose');
+
 
 const userSchema = new Schema({
     fname:{
@@ -38,6 +40,18 @@ const userSchema = new Schema({
         type:String,
         default:""
     },
+    savedPost: [
+        {
+          post: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Post', // Reference to the Post model
+          },
+          createdAt: {
+            type: Date,
+            default: Date.now,
+          },
+        },
+      ],
 
 },
 {timestamps:true});

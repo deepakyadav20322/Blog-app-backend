@@ -14,7 +14,7 @@ const userLogin = async (req, res) => {
         .json({ message: "All fields are required", success: false });
     }
 
-    const user = await userAllData.findOne({ email: email });
+    const user = await userAllData.findOne({ email: email }) ;
     if (user) {
       // const passwordMatch =
       if (password == user.password) {
@@ -90,7 +90,7 @@ const userRegister = async (req, res) => {
     }
   } catch (error) {
     console.log(error);
-    res.status(400).json({ message: "Server error during resistration" });
+    res.status(400).json({ message: "Server error during registration" });
   }
 };
 
@@ -184,4 +184,81 @@ const resetPassword = async(req,res)=>{
   }
 }
 
-module.exports = { userLogin, userRegister, VerifyEmail,VerificationDone,forgetPass,resetPassword };
+
+const deleteUserAccount = async(req,res)=>{
+     try {
+      console.log(req.user._id);
+      const  user = await userAllData.findById(req.user._id);
+      if(!user){
+        res.status(500).json({message:"User not exist",success:false});
+      }else{
+        console.log('user deleted....');
+        const deletedUser =  await userAllData.findOneAndDelete(req.user._id);
+        if(deletedUser){
+        res.status(200).json({ message: "User deleted successfully", success:true});
+        }else{
+          res.status(500).json({ message: "Userexist but not deleted successfully", success:false});
+        }
+      }
+      
+     } catch (error) {
+      console.log(error);
+      res.status(400).json({ message: "Server error during forgetPass", success:false});
+     }
+}
+
+ const  updateUser = async(req,res)=>{
+  try {
+    console.log('update,user working')
+    const {id}  = req.params;
+    const { fname, lname, email,mob, bio } = req.body;
+             
+    if (!fname || !lname || !mob) {
+      res
+        .status(500)
+        .json({ message: "All fields are required.", success: false });
+    }
+
+    const user = await userAllData.findById(id);
+    
+     user.fname = fname;
+     user.lname = lname;
+     user.email = email;
+     user.mob = mob;
+     user.bio = bio;
+ 
+     await user.save();
+ 
+     res.status(200).json({ message: 'User updated successfully',data:user ,success:true}); 
+
+    } catch (error) {
+      console.error('Error updating user:', error);
+      res.status(500).json({ error: 'Could not update user' });
+    }
+  
+ }
+
+
+ const getSingleUser = async(req,res)=>{
+  try {
+   const {id} =  req.params;
+   console.log("user id:->",id)
+   const user = await userAllData.findById(id);
+
+   if(user){
+    res.status(200).json({ message: 'User Find successfully', data:user,success:true }); 
+   }else{
+    res.status(500).json({ message: 'User not found', success:false }); 
+   }
+    
+  } catch (error) {
+    console.error('Error updating user:', error);
+    res.status(500).json({ error: 'Could not update user' });
+  }
+ };
+
+
+
+
+
+module.exports = { userLogin, userRegister, VerifyEmail,VerificationDone,forgetPass,resetPassword,deleteUserAccount,getSingleUser,updateUser, };
