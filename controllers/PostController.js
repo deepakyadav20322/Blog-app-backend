@@ -3,6 +3,7 @@ const Post = require("../db/postSchema");
 const userAllData = require("../db/userSchema"); 
 
 
+
 // Create a new post---------------
 const createPost = async (req, res) => {
   try {
@@ -100,7 +101,8 @@ const updatePost = async (req, res) => {
 // Delete a post by ID
 const deletePost = async (req, res) => {
   try {
-    const { postId } = req.params;
+    const { id } = req.params;
+    const postId =id;
 
     const post = await Post.findByIdAndRemove(postId);
 
@@ -264,23 +266,49 @@ const unSavePost = async(req,res)=>{
   }
 }
 
-const fetchAllSavedPost = async(req,res)=>{
-  try {
-    
-   const userId = req.user;
-   const savedAllPosts = await savePosts.find().populate(); 
-   if(savedAllPosts){
-    console.log(savedAllPosts)
-    res.status(200).json({ message: 'All saved post',data:savedAllPosts,success:true});
-   }else{
-    res.status(500).json({ message: 'Not find any saved post',success:false });
-   }
 
-  } catch (error) {
-    console.log(error)
-    res.status(400).json({ message: 'Could not get any post' });
+  const fetchAllSavedPost = async (req, res) => {
+    try {
+      const userId = req.user;
+  
+      const savedAllPosts = await userAllData
+        .find({ _id: userId })
+        .populate({
+          path: 'savedPost.post', // Populate the 'post' field
+          populate: {
+            path: 'author', // Populate the 'user' field in the 'post' document
+            select: 'fname lname createdAt', // Specify the fields to retrieve from the 'user' document
+          }});
+  
+      if (savedAllPosts.length > 0) { // because find() give an array
+        console.log(savedAllPosts);
+        res.status(200).json({ message: 'All saved posts', data: savedAllPosts[0].savedPost, success: true });
+      } else {
+        res.status(404).json({ message: 'No saved posts found for the user', success: false });
+      }
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: 'Could not get saved posts', success: false });
+    }
+  };
+  
+  const getAllPostToSpecificUser = async(req,res)=>{
+    try {
+     
+      const userId = req.params.userId; 
+      if (!mongoose.Types.ObjectId.isValid(userId)) {
+        return res.status(400).json({ error: 'Invalid userId ID' });
+      }
+      // Find all posts where the author field matches the user ID
+      const posts = await Post.find({ author: userId }).populate('author', 'fname lname email'); // Populate author field with user's first and last name
+  
+      res.status(200).json({ success: true, data: posts });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ success: false, message: 'Could not fetch posts for the user.' });
+    }
   }
-}
+
 
 module.exports = {
   createPost,
@@ -293,5 +321,7 @@ module.exports = {
   addCommentToPost,
   savedPost,
   unSavePost,
-  fetchAllSavedPost
+  fetchAllSavedPost,
+  getAllPostToSpecificUser
+  
 };

@@ -1,6 +1,7 @@
 const userAllData = require("../db/userSchema");
 const sendEmail = require("../service.js/SendEmail");
 const ResetPassMail = require("../service.js/ResetPassMail");
+const mongoose = require('mongoose');
 const { tokenGenerate } = require("../helper");
 const { v4: uuidv4 } = require('uuid');
 
@@ -19,6 +20,7 @@ const userLogin = async (req, res) => {
       // const passwordMatch =
       if (password == user.password) {
         if(user.emailVerify==1){
+          if(user.blocked==0){
         const token = await tokenGenerate(user);
         res
           .status(200)
@@ -28,6 +30,11 @@ const userLogin = async (req, res) => {
             token:{token},
             success: true,
           });
+        }else{
+          res
+          .status(500)
+          .json({ message: "You are blocked. Contact with to team!", success: false });
+          }
         }else{
           res
           .status(500)
@@ -209,9 +216,10 @@ const deleteUserAccount = async(req,res)=>{
 
  const  updateUser = async(req,res)=>{
   try {
-    console.log('update,user working')
+    console.log('update,user working ', req.body)
     const {id}  = req.params;
-    const { fname, lname, email,mob, bio } = req.body;
+    const { fname, lname, email,mob, bio, websiteURL,location, available,currentLearning,skillLanguage,work,
+              education,brandColor} = req.body;
              
     if (!fname || !lname || !mob) {
       res
@@ -226,6 +234,15 @@ const deleteUserAccount = async(req,res)=>{
      user.email = email;
      user.mob = mob;
      user.bio = bio;
+     user.location = location;
+     user.websiteURL = websiteURL;
+     user.available = available;
+     user.currentLearning = currentLearning;
+     user.skillLanguage = skillLanguage;
+     user.education = education;
+     user.work = work;
+     user.brandColor = brandColor;
+    
  
      await user.save();
  
@@ -257,8 +274,95 @@ const deleteUserAccount = async(req,res)=>{
   }
  };
 
+const getRandomUserInfo = async(req,res)=>{
+ try {
+   const {id} =  req.params;
+   console.log("user id:->",id)        
+   if (!mongoose.Types.ObjectId.isValid(id)) {
+    return res.status(400).json({ error: 'Invalid userId ID' });
+  }
+  
+  const user = await userAllData.findById(id).select('-password -isAdmin -blocked -savedPost -emailVerify');
+
+   if(user){
+    res.status(200).json({ message: 'User Find successfully', data:user,success:true }); 
+   }else{
+    res.status(500).json({ message: 'User not found', success:false }); 
+   }
+    
+  } catch (error) {
+    console.error('Error updating user:', error);
+    res.status(500).json({ error: 'Could not update user' });
+  }
+
+};
 
 
+  const userUnFollow = async (req, res) => {
+    const { userIdToUnfollow } = req.params;
+    const userId = req.user._id;
+  
+    try {
+      // Find the user who wants to unfollow
+      const user = await userAllData.findById(userId);
+  
+      // Check if the user is following the user to unfollow
+      if (user.following.includes(userIdToUnfollow)) {
+        // Remove userIdToUnfollow from the following array
+        user.following = user.following.filter(id => id.toString() !== userIdToUnfollow);
+        
+        // Save the updated user object
+        await user.save();
 
+         // Remove the follower's ID from the followers array of the user being unfollowed
+      const userToUnfollowUpdated = await userAllData.findByIdAndUpdate(
+        userIdToUnfollow,
+        { $pull: { followers: userId } },
+        { new: true }
+      );
+  
+        return res.status(200).json({ message: 'Unfollowed successfully', success: true });
+      } else {
+        return res.status(400).json({ message: 'You are not following this user', success: false });
+      }
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ message: 'Internal server error', success: false });
+    }
+  };
+  
 
-module.exports = { userLogin, userRegister, VerifyEmail,VerificationDone,forgetPass,resetPassword,deleteUserAccount,getSingleUser,updateUser, };
+const userFollow = async (req, res) => {
+  const { userIdToFollow } = req.params;
+  const userId = req.user._id;
+
+  try {
+    // Find the user who wants to follow
+    const user = await userAllData.findById(userId);
+
+    // Check if the user is already following the user to follow
+    if (!user.following.includes(userIdToFollow)) {
+      // Add userIdToFollow to the following array
+      user.following.push(userIdToFollow);
+      
+      // Save the updated user object
+      await user.save();
+
+      // Update the userToFollow's followers array
+      const userToFollowUpdate = await userAllData.findByIdAndUpdate(
+        userIdToFollow,
+        { $push: { followers: userId } },
+        { new: true }
+      );
+
+      return res.status(200).json({ message: 'Followed successfully', success: true });
+    } else {
+      return res.status(400).json({ message: 'You are already following this user', success: false });
+    }
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: 'Internal server error', success: false });
+  }
+};
+
+module.exports = { userLogin, userRegister, VerifyEmail,VerificationDone,forgetPass,resetPassword,deleteUserAccount,getSingleUser,updateUser,getRandomUserInfo,userUnFollow,userFollow };

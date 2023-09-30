@@ -14,6 +14,9 @@ postRoute.post('/addCommentToPost/:id',auth,postController.addCommentToPost);
 postRoute.post('/savePost/:id',auth,postController.savedPost)
 postRoute.delete('/unSavePost/:id',auth,postController.unSavePost)
 postRoute.get('/fetchAllSavedPost',auth,postController.fetchAllSavedPost);
+postRoute.get('/getAllPostToSpecificUser/:userId',postController.getAllPostToSpecificUser);
+
+
 
 
 

@@ -12,7 +12,9 @@ userRoute.post('/resetPassword/:uuid',uesrController.resetPassword);
 userRoute.get('/getSingleUser/:id',auth,uesrController.getSingleUser);
 userRoute.post('/updateUser/:id',auth,uesrController.updateUser);
 userRoute.delete('/deleteUserAccount',auth,uesrController.deleteUserAccount);
-
+userRoute.get('/getRandomUserInfo/:id',uesrController.getRandomUserInfo)
+userRoute.get('/userFollow/:userIdToFollow',auth,uesrController.userFollow)
+userRoute.get('/userUnFollow/:userIdToUnfollow',auth,uesrController.userUnFollow)
 
 
 
