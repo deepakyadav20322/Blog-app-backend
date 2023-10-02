@@ -16,6 +16,9 @@ const postSchema = new mongoose.Schema({
     required: true,
     trim:true
   },
+  mainImage:{
+    type:String
+  },
   author: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
@@ -48,6 +51,10 @@ const postSchema = new mongoose.Schema({
         default: Date.now,
       },
     }],
+    likes: [{
+  type: mongoose.Schema.Types.ObjectId,
+  ref: 'User', // Reference to the User model for users who liked the post
+}],
 },
 {timestamps:true});
 

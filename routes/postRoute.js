@@ -1,9 +1,48 @@
 const express = require('express');
 const postRoute = express();
 const postController = require('../controllers/PostController')
-const {auth} = require('../middleware/auth')
+const {auth} = require('../middleware/auth');
+const multer = require('multer');
+const path =require('path');
+const { handleMulterError } = require('../middleware/handleMulterError');
 
-postRoute.post('/createPost',auth,postController.createPost);
+
+// ============================== Multer configuration for uploading mainImage ===========================
+
+const storage = multer.diskStorage({
+    destination: function(req,file,cb){
+        cb(null,path.join(__dirname,'../public/BlogImages'));
+    },
+    filename:function(req,file,cb) {
+        cb(null, file.fieldname + '-' + Date.now() + '-' + file.originalname);
+    }
+});
+
+const upload = multer({
+    storage: storage ,
+    fileFilter:(req, file, cb) => {
+     const allowedExtensions = ['.jpeg','.png','.jpg'];
+     // Get the file extension by using path module
+     const fileExtension = path.extname(file.originalname).toLowerCase();
+   
+     // Check if the file extension is allowed
+     if (allowedExtensions.includes(fileExtension)) {
+       cb(null, true);
+     } else {
+       const error = new multer.MulterError('Only JPEG files are allowed');
+       error.code = 'LIMIT_FILE_TYPES'; //  Set a custom error code
+       cb(error);
+     }
+   },
+    limits: { fileSize: 1024 * 1024 } // 1MB size limit size 
+   });
+
+
+
+
+// -------------------------------- ********************************* ------------------------------------
+
+postRoute.post('/createPost',auth,upload.single("mainImage"),handleMulterError,postController.createPost);
 postRoute.get('/getSinglePost/:id',postController.getPostById);
 postRoute.get('/getPostByIdForUpdate/:id',postController.getPostByIdForUpdating);
 postRoute.get('/getAllPosts',postController.getAllPosts);
@@ -15,7 +54,8 @@ postRoute.post('/savePost/:id',auth,postController.savedPost)
 postRoute.delete('/unSavePost/:id',auth,postController.unSavePost)
 postRoute.get('/fetchAllSavedPost',auth,postController.fetchAllSavedPost);
 postRoute.get('/getAllPostToSpecificUser/:userId',postController.getAllPostToSpecificUser);
-
+postRoute.get('/likePost/:postId',auth,postController.likePost)
+postRoute.get('/unlikePost/:postId',auth,postController.unlikePost)
 
 
 

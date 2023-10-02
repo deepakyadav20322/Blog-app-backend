@@ -1,7 +1,7 @@
 const { default: mongoose } = require("mongoose");
 const Post = require("../db/postSchema"); 
 const userAllData = require("../db/userSchema"); 
-
+const main = require('../index');
 
 
 // Create a new post---------------
@@ -10,11 +10,12 @@ const createPost = async (req, res) => {
     console.log( req.user._id)
     
     const { title, description, content,tags } = req.body;
+    const  mainImage = req.file;
      const author = req.user._id;
-    const post = new Post({ title, description, content, author, tags });
+    const post = new Post({ title, description, content, author, tags,mainImage:req.file.filename, });
 
     await post.save();
-       console.log('POST save Data=>',post)
+       console.log('POST save Data=>')
     res.status(200).json(post);
   } catch (error) {
     console.error("Error creating post:", error);
@@ -310,6 +311,78 @@ const unSavePost = async(req,res)=>{
   }
 
 
+  const likePost = async (req, res) => {
+    const { postId} = req.params;
+    const userId = req.user._id;
+    console.log('userid',userId)
+    console.log('podtId',postId)
+    try {
+      // it check that given compactibale  postId or not
+      if (!mongoose.Types.ObjectId.isValid(userId)) {
+        return res.status(400).json({ message: 'Invalid userId ID' });
+      }
+
+      const post = await Post.findById(postId);
+      if (!post) {
+        return res.status(404).json({ message: 'Post not found' ,success:false});
+      }
+  
+      // Check if the user already liked the post
+      if (!post.likes.includes(userId)) {
+        post.likes.push(userId);
+        await post.save();
+  
+        // // Emit an event for real-time updates (assuming you are using Socket.io)
+        // main.io.emit('postLiked', postId);
+        
+  
+        return res.json({ message: 'Post liked successfully',data:post, success:true });
+      }
+  
+      return res.status(400).json({ message: 'Post already liked by the user',success:false });
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ message: 'Internal server error' });
+    }
+  };
+  
+
+  const unlikePost = async (req, res) => {
+    const { postId} = req.params;
+    const userId = req.user._id;
+    
+    try {
+
+          // it check that given compactibale  postId or not
+      if (!mongoose.Types.ObjectId.isValid(userId)) {
+        return res.status(400).json({ message: 'Invalid userId ID' });
+      }
+
+      const post = await Post.findById(postId);
+      if (!post) {
+        return res.status(404).json({ message: 'Post not found' ,success:false});
+      }
+  
+      // Check if the user has already liked the post
+      const likeIndex = post.likes.indexOf(userId);// it return the index of _id if not exist then return -1
+      if (likeIndex !== -1) {
+        post.likes.splice(likeIndex, 1);
+        await post.save();
+  
+        // // Emit an event for real-time updates (assuming you are using Socket.io)
+        // io.emit('postUnliked', postId);
+  
+        return res.json({ message: 'Post unliked successfully',data:post,success:false });
+      }
+  
+      return res.status(400).json({ message: 'Post not liked by the user' });
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ message: 'Internal server error' });
+    }
+  };
+  
+
 module.exports = {
   createPost,
   deletePost,
@@ -322,6 +395,8 @@ module.exports = {
   savedPost,
   unSavePost,
   fetchAllSavedPost,
-  getAllPostToSpecificUser
+  getAllPostToSpecificUser,
+  unlikePost,
+  likePost,
   
 };

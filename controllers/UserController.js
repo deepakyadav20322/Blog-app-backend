@@ -5,6 +5,7 @@ const mongoose = require('mongoose');
 const { tokenGenerate } = require("../helper");
 const { v4: uuidv4 } = require('uuid');
 
+
 const userLogin = async (req, res) => {
   console.log(req.body);
   try {
@@ -22,11 +23,12 @@ const userLogin = async (req, res) => {
         if(user.emailVerify==1){
           if(user.blocked==0){
         const token = await tokenGenerate(user);
+        const userData = await userAllData.findOne({ email: email }).select(' -password -passwordToken -emailVerify -blocked') ;
         res
           .status(200)
           .json({
             message: "user Login successfully",
-            data: { user},
+            data: { user:userData},
             token:{token},
             success: true,
           });
@@ -311,7 +313,6 @@ const getRandomUserInfo = async(req,res)=>{
         // Remove userIdToUnfollow from the following array
         user.following = user.following.filter(id => id.toString() !== userIdToUnfollow);
         
-        // Save the updated user object
         await user.save();
 
          // Remove the follower's ID from the followers array of the user being unfollowed
@@ -320,8 +321,11 @@ const getRandomUserInfo = async(req,res)=>{
         { $pull: { followers: userId } },
         { new: true }
       );
-  
-        return res.status(200).json({ message: 'Unfollowed successfully', success: true });
+          //get again userData because we send limited data to save in localstorage
+          const userData = await userAllData.findById(userId).select('-password -passwordToken -emailVerify -blocked -isAdmin -currentLearning -brandColor');
+          
+          
+        return res.status(200).json({ message: 'Unfollowed successfully',data:userData, success: true });
       } else {
         return res.status(400).json({ message: 'You are not following this user', success: false });
       }
@@ -355,7 +359,11 @@ const userFollow = async (req, res) => {
         { new: true }
       );
 
-      return res.status(200).json({ message: 'Followed successfully', success: true });
+       //get again userData because we send limited data to save in localstorage
+      const userData = await userAllData.findById(userId).select('-password -passwordToken -emailVerify -blocked -isAdmin -currentLearning -brandColor');
+      
+    
+      return res.status(200).json({ message: 'Followed successfully',data:userData, success: true });
     } else {
       return res.status(400).json({ message: 'You are already following this user', success: false });
     }
