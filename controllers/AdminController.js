@@ -1,5 +1,6 @@
 const userAllData = require('../db/userSchema');
 const allUserPost = require('../db/postSchema');
+const Category = require('../db/categorySchema')
 const { tokenGenerate } = require("../helper");
 
 
@@ -125,8 +126,47 @@ const getAllUserInfo = async (req, res) => {
   };
   
 
+  // Create a new category------------------------
+const createCategory = async (req, res) => {
+  const { categoryName, description } = req.body;
+  
+  try {
+      // Check if the category already exists
+      const existingCategory = await Category.findOne({ categoryName });
+     
+      if (existingCategory) {
+          return res.status(400).json({ message: 'Category already exists',success:false });
+      }
+
+      // Create a new category
+      const category = new Category({
+        categoryName,
+          description
+      });
+     
+      // Save the category to the database
+    const deep =  await category.save();
+      
+      res.status(200).json({message:'category create successfull',data:category,success:false});
+  } catch (error) {
+    console.log(error );
+      res.status(500).json({ message: 'Internal server error',error });
+  }
+};
+
+const getCategories = async (req, res) => {
+  try {
+      const categories = await Category.find();
+      res.status(200).json({message:'all category fetched successfully',data: categories});
+  } catch (error) {
+      res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
 module.exports = {
     adminLogin,
     getAllUserInfo,
-    blockToUser
+    blockToUser,
+    createCategory,
+    getCategories
 }

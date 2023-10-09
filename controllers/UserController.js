@@ -23,7 +23,12 @@ const userLogin = async (req, res) => {
         if(user.emailVerify==1){
           if(user.blocked==0){
         const token = await tokenGenerate(user);
-        const userData = await userAllData.findOne({ email: email }).select(' -password -passwordToken -emailVerify -blocked') ;
+        const userData = await userAllData.findOne({ email: email }).populate({
+          path: 'followers',
+          select: 'fname lname email profileImg'})
+          .populate({ path: 'following',
+           select: 'fname lname email profileImg'})
+          .select('-password -passwordToken -emailVerify -blocked')
         res
           .status(200)
           .json({
@@ -222,6 +227,8 @@ const deleteUserAccount = async(req,res)=>{
     const {id}  = req.params;
     const { fname, lname, email,mob, bio, websiteURL,location, available,currentLearning,skillLanguage,work,
               education,brandColor} = req.body;
+              console.log('files',req.file.filename) 
+              const profileImg = req.file.filename
              
     if (!fname || !lname || !mob) {
       res
@@ -244,6 +251,7 @@ const deleteUserAccount = async(req,res)=>{
      user.education = education;
      user.work = work;
      user.brandColor = brandColor;
+     user.profileImg = profileImg;  
     
  
      await user.save();
@@ -373,4 +381,30 @@ const userFollow = async (req, res) => {
   }
 };
 
-module.exports = { userLogin, userRegister, VerifyEmail,VerificationDone,forgetPass,resetPassword,deleteUserAccount,getSingleUser,updateUser,getRandomUserInfo,userUnFollow,userFollow };
+
+
+const getgetFollowerFollowing = async(req,res)=>{
+
+  try {
+     const {userId} = req.params ; 
+     const userData = await userAllData.findById(userId).populate({
+      path: 'followers',
+      select: 'fname lname email profileImg'})
+      .populate({ path: 'following',
+       select: 'fname lname email profileImg'})
+      .select('follower following');
+           if(!userData){
+            return res.status(400).json({ message: 'User not exist', success: false });
+           }else{
+            return res.status(200).json({ message: 'User data fetched to show follower and following', data: userData, success: true });
+           }
+     
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: 'Internal server error', success: false });
+  }
+}
+
+
+
+module.exports = { userLogin, userRegister, VerifyEmail,VerificationDone,forgetPass,resetPassword,deleteUserAccount,getSingleUser,updateUser,getRandomUserInfo,userUnFollow,userFollow,getgetFollowerFollowing };

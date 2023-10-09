@@ -9,12 +9,23 @@ const createPost = async (req, res) => {
   try {
     console.log( req.user._id)
     
-    const { title, description, content,tags } = req.body;
+    const { title, description, content,tags ,readTime,category} = req.body;
     const  mainImage = req.file;
      const author = req.user._id;
-    const post = new Post({ title, description, content, author, tags,mainImage:req.file.filename, });
+    const post = new Post({ title, description, content, author, readTime,tags,mainImage:req.file.filename,category });
 
     await post.save();
+
+            // send notification when create posts to followers
+    const userData = await userAllData.findById(req.user._id); // Implement this function to get followers from DB
+      (userData.followers).forEach(async (followerId) => {
+     
+          main.io.to(followerId).emit("sendNewPostNotify", { postId: post._id, message: "New post created by the writer!" });
+          console.log(`Notification sent to follower: ${followerId}`);
+        
+    });
+
+
        console.log('POST save Data=>')
     res.status(200).json(post);
   } catch (error) {
@@ -23,20 +34,8 @@ const createPost = async (req, res) => {
   }
 };
 
-// Get all posts ------------------------------------------------------
-const getAllPosts = async (req, res) => {
-  try {
-    const posts = await Post.find().sort({ createdAt: -1 }).populate("author")
-    // const posts = await Post.find().populate("author").populate("likes");
 
-    res.status(200).json({data:posts,message:"All post successfulluy retrive"});
-  } catch (error) {
-    console.error("Error fetching posts:", error);
-    res.status(400).json({ error: "Could not fetch posts" });
-  }
-};
 
-// Get a post by ID -----------------------------
 const getPostById = async (req, res) => {
   try {
     const { id } = req.params;
@@ -47,7 +46,7 @@ const getPostById = async (req, res) => {
     }
 
     // Find the post by ID
-    const post = await Post.findById(postId).populate("author").populate("comments.author");
+    const post = await Post.findById(postId).populate("author").populate("comments.author").populate('likes');
 
     if (!post) {
       return res.status(500).json({ error: "Post not found" });
@@ -80,11 +79,11 @@ const updatePost = async (req, res) => {
   try {
     const { id } = req.params;
     const postId = id;
-    const { title, description, content, tags } = req.body;
+    const { title, description, content, tags ,readTime} = req.body;
 
     const post = await Post.findByIdAndUpdate(
       postId,
-      { title, description, content, tags },
+      { title, description, content, tags,readTime },
       { new: true }
     );
 
@@ -382,6 +381,67 @@ const unSavePost = async(req,res)=>{
     }
   };
   
+// get all post with searching and category ----- 
+  const getAllPosts = async (req, res) => {
+    try {
+      console.log('query run------------------')
+      let query = {};
+  
+      // Check if both category and search query parameters are provided
+      if (req.query.category && req.query.search) {
+        query.category = req.query.category;
+        query.$or = [
+          { title: { $regex: req.query.search, $options: 'i' } },
+          { content: { $regex: req.query.search, $options: 'i' } }
+        ];
+      }
+      // Check if only category query parameter is provided
+      else if (req.query.category) {
+        query.category = req.query.category;
+      }
+      // Check if only search query parameter is provided
+      else if (req.query.search) {
+        query.$or = [
+          { title: { $regex: req.query.search, $options: 'i' } },
+          { description: { $regex: req.query.search, $options: 'i' } }
+        ];
+      }
+  
+      const posts = await Post.find(query).sort({ createdAt: -1 }).populate('author');
+  
+      res.status(200).json({ data: posts, message: 'Posts successfully retrieved' });
+    } catch (error) {
+      console.error('Error fetching posts:', error);
+      res.status(400).json({ error: 'Could not fetch posts' });
+    }
+  };
+  
+
+// Get Top 4 post to show in singleblogPage as a recomendation.............
+  const getAllPostsOfUserForRecomedation = async (req, res) => {
+    try {
+      const { id } = req.params; 
+
+      const userPosts = await Post.findById(id);
+      // console.log(userPosts)
+
+      const userIdOfPost  = userPosts.author._id
+      console.log(userIdOfPost)
+      if (!userPosts) {
+        // If no posts are found, return an appropriate response
+        return res.status(404).json({ error: 'No posts found for this user' });
+      }
+      const allpostsOfuser = await Post.find({author:userIdOfPost})
+      const filterData = allpostsOfuser.sort((a, b) => b.createdAt - a.createdAt).slice(0,4);
+      res.status(200).json({ data: filterData, message: 'User posts retrieved successfully' });
+    } catch (error) {
+      console.error('Error fetching user posts:', error);
+      res.status(500).json({ error: 'Could not fetch user posts for recomendation' });
+    }
+  };
+
+
+
 
 module.exports = {
   createPost,
@@ -398,5 +458,6 @@ module.exports = {
   getAllPostToSpecificUser,
   unlikePost,
   likePost,
+  getAllPostsOfUserForRecomedation
   
 };

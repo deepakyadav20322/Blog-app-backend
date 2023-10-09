@@ -47,6 +47,7 @@ postRoute.get('/getSinglePost/:id',postController.getPostById);
 postRoute.get('/getPostByIdForUpdate/:id',postController.getPostByIdForUpdating);
 postRoute.get('/getAllPosts',postController.getAllPosts);
 postRoute.get('/getAllPostsOfUser/:id',postController.getAllPostsOfUser);
+postRoute.get('/getAllPostsOfUserRecomendation/:id',postController.getAllPostsOfUserForRecomedation);
 postRoute.post('/updatePost/:id',auth,postController.updatePost);
 postRoute.delete('/deletePost/:id',auth,postController.deletePost);
 postRoute.post('/addCommentToPost/:id',auth,postController.addCommentToPost);
@@ -56,7 +57,6 @@ postRoute.get('/fetchAllSavedPost',auth,postController.fetchAllSavedPost);
 postRoute.get('/getAllPostToSpecificUser/:userId',postController.getAllPostToSpecificUser);
 postRoute.get('/likePost/:postId',auth,postController.likePost)
 postRoute.get('/unlikePost/:postId',auth,postController.unlikePost)
-
 
 
 

@@ -19,6 +19,10 @@ const postSchema = new mongoose.Schema({
   mainImage:{
     type:String
   },
+  readTime:{
+    type:Number,
+    // required:true,
+  },
   author: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
@@ -36,6 +40,10 @@ const postSchema = new mongoose.Schema({
   saveCount:{
     type:Number,
     default:0,
+  },
+  category:{
+    type:String,
+    // required:true,
   },
   comments: [{
       commentText: {

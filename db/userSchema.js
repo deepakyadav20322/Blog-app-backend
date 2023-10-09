@@ -28,6 +28,9 @@ const userSchema = new Schema({
         default:'I am a Writer',
         trim:true
     },
+    profileImg:{
+      type:String,
+    },
     mob:{
         type:Number,
         required:true,

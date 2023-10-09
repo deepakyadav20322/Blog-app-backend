@@ -48,10 +48,13 @@ io.on('connection',(socket)=>{
         // Emit an event to update clients in real-time
         io.emit('postUnliked', post);
       });
+     
 
     socket.on('disconnect',()=>{
         console.log('user disconnected...',socket.id);
     })
+
+   
 })
 
 
@@ -62,6 +65,4 @@ server.listen(port,()=>{
 
 exports.io = io
 
-// app.listen(port,()=>{
-//     console.log(`Server is running on port ${port}`);
-// })
+
