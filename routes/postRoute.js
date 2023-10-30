@@ -21,7 +21,7 @@ const storage = multer.diskStorage({
 const upload = multer({
     storage: storage ,
     fileFilter:(req, file, cb) => {
-     const allowedExtensions = ['.jpeg','.png','.jpg'];
+     const allowedExtensions = ['.jpeg','.png','.jpg','.webp'];
      // Get the file extension by using path module
      const fileExtension = path.extname(file.originalname).toLowerCase();
    

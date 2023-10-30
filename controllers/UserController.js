@@ -223,6 +223,39 @@ const deleteUserAccount = async(req,res)=>{
 
  const  updateUser = async(req,res)=>{
   try {
+    if(!req.file){
+    console.log('update,user working ', req.body)
+    const {id}  = req.params;
+    const { fname, lname, email,mob, bio, websiteURL,location, available,currentLearning,skillLanguage,work,
+              education,brandColor} = req.body;
+             
+    if (!fname || !lname || !mob) {
+      res
+        .status(500)
+        .json({ message: "All fields are required.", success: false });
+    }
+
+    const user = await userAllData.findById(id);
+    
+     user.fname = fname;
+     user.lname = lname;
+     user.email = email;
+     user.mob = mob;
+     user.bio = bio;
+     user.location = location;
+     user.websiteURL = websiteURL;
+     user.available = available;
+     user.currentLearning = currentLearning;
+     user.skillLanguage = skillLanguage;
+     user.education = education;
+     user.work = work;
+     user.brandColor = brandColor;
+    
+ 
+     await user.save();
+ 
+     res.status(200).json({ message: 'User updated successfully',data:user ,success:true}); 
+  }else{
     console.log('update,user working ', req.body)
     const {id}  = req.params;
     const { fname, lname, email,mob, bio, websiteURL,location, available,currentLearning,skillLanguage,work,
@@ -257,6 +290,8 @@ const deleteUserAccount = async(req,res)=>{
      await user.save();
  
      res.status(200).json({ message: 'User updated successfully',data:user ,success:true}); 
+
+  }
 
     } catch (error) {
       console.error('Error updating user:', error);

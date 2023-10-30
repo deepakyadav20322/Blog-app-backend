@@ -15,16 +15,8 @@ const createPost = async (req, res) => {
     const post = new Post({ title, description, content, author, readTime,tags,mainImage:req.file.filename,category });
 
     await post.save();
-
-            // send notification when create posts to followers
-    const userData = await userAllData.findById(req.user._id); // Implement this function to get followers from DB
-      (userData.followers).forEach(async (followerId) => {
-     
-          main.io.to(followerId).emit("sendNewPostNotify", { postId: post._id, message: "New post created by the writer!" });
-          console.log(`Notification sent to follower: ${followerId}`);
         
-    });
-
+    // write logic to save notification in all ?
 
        console.log('POST save Data=>')
     res.status(200).json(post);
@@ -277,7 +269,7 @@ const unSavePost = async(req,res)=>{
           path: 'savedPost.post', // Populate the 'post' field
           populate: {
             path: 'author', // Populate the 'user' field in the 'post' document
-            select: 'fname lname createdAt', // Specify the fields to retrieve from the 'user' document
+            select: 'fname lname profileImg createdAt', // Specify the fields to retrieve from the 'user' document
           }});
   
       if (savedAllPosts.length > 0) { // because find() give an array
@@ -333,9 +325,10 @@ const unSavePost = async(req,res)=>{
   
         // // Emit an event for real-time updates (assuming you are using Socket.io)
         // main.io.emit('postLiked', postId);
-        
+        const userIds = post.likes.map(like => like.toString());
+       
   
-        return res.json({ message: 'Post liked successfully',data:post, success:true });
+        return res.status(200).json({ message: 'Post liked successfully',data:userIds, success:true });
       }
   
       return res.status(400).json({ message: 'Post already liked by the user',success:false });
@@ -370,8 +363,9 @@ const unSavePost = async(req,res)=>{
   
         // // Emit an event for real-time updates (assuming you are using Socket.io)
         // io.emit('postUnliked', postId);
-  
-        return res.json({ message: 'Post unliked successfully',data:post,success:false });
+        const userIds = post.likes.map(like => like.toString());
+     
+        return res.status(200).json({ message: 'Post unliked successfully',data:userIds,success:false });
       }
   
       return res.status(400).json({ message: 'Post not liked by the user' });
@@ -431,8 +425,10 @@ const unSavePost = async(req,res)=>{
         // If no posts are found, return an appropriate response
         return res.status(404).json({ error: 'No posts found for this user' });
       }
-      const allpostsOfuser = await Post.find({author:userIdOfPost})
-      const filterData = allpostsOfuser.sort((a, b) => b.createdAt - a.createdAt).slice(0,4);
+      const allpostsOfuser = await Post.find({author:userIdOfPost});
+      const mostLikedPosts =  allpostsOfuser.sort((a, b) => b.likes?.length - a.createdAt?.length)
+      console.log("likeds",mostLikedPosts)
+      const filterData = mostLikedPosts.sort((a, b) => b.createdAt - a.createdAt).slice(0,4);
       res.status(200).json({ data: filterData, message: 'User posts retrieved successfully' });
     } catch (error) {
       console.error('Error fetching user posts:', error);

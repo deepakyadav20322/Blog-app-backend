@@ -2,6 +2,7 @@ const express = require('express');
 require('dotenv').config();
 const connectToDatabase = require('./db/connection')
 const cors = require('cors');
+const allUser = require('./db/userSchema')
 const app = express();
 
 
@@ -35,18 +36,21 @@ const server = http.createServer(app);
 io.on('connection',(socket)=>{
     console.log('user connected',socket.id);
 
-    socket.on('likePost', (post) => {
+    socket.on('likePost', async(post) => {
         console.log('like on',post)
         // Handle liking the post (save to database, etc.)
         // Emit an event to update clients in real-time
+     
         io.emit('postLiked', post);
       });
     
-      socket.on('UnlikePost', (post) => {
+      socket.on('UnlikePost', async(post) => {
         console.log('unlike on',post)
         // Handle disliking the post (save to database, etc.)
         // Emit an event to update clients in real-time
-        io.emit('postUnliked', post);
+      
+        
+        io.emit('postUnliked',post);
       });
      
 
