@@ -292,7 +292,7 @@ const unSavePost = async(req,res)=>{
         return res.status(400).json({ error: 'Invalid userId ID' });
       }
       // Find all posts where the author field matches the user ID
-      const posts = await Post.find({ author: userId }).populate('author', 'fname lname email'); // Populate author field with user's first and last name
+      const posts = await Post.find({ author: userId }).populate('author', 'fname lname email profileImg'); // Populate author field with user's first and last name
   
       res.status(200).json({ success: true, data: posts });
     } catch (error) {
