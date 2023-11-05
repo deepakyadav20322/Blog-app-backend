@@ -32,18 +32,16 @@ const getPostById = async (req, res) => {
   try {
     const { id } = req.params;
     const postId = id
-    console.log("single post",postId);
+    // console.log("single post",postId);
     if (!mongoose.Types.ObjectId.isValid(postId)) {
       return res.status(400).json({ error: 'Invalid post ID' });
     }
-
     // Find the post by ID
     const post = await Post.findById(postId).populate("author").populate("comments.author").populate('likes');
-
+  
     if (!post) {
       return res.status(500).json({ error: "Post not found" });
     }
-
     // Increment the view count
     post.viewCount += 1;
 
@@ -58,7 +56,6 @@ const getPostById = async (req, res) => {
     //     )
         // .populate("likes")
       // .execPopulate();
-
     res.status(200).json(post);
   } catch (error) {
     console.error("Error fetching post:", error);
@@ -68,6 +65,8 @@ const getPostById = async (req, res) => {
 
 // Update a post by ID ----------------------------------
 const updatePost = async (req, res) => {
+  const contentLength = req.headers['content-length'];
+  console.log(`Request Payload Size: ${contentLength} bytes`);
   try {
     const { id } = req.params;
     const postId = id;
@@ -427,7 +426,6 @@ const unSavePost = async(req,res)=>{
       }
       const allpostsOfuser = await Post.find({author:userIdOfPost});
       const mostLikedPosts =  allpostsOfuser.sort((a, b) => b.likes?.length - a.createdAt?.length)
-      console.log("likeds",mostLikedPosts)
       const filterData = mostLikedPosts.sort((a, b) => b.createdAt - a.createdAt).slice(0,4);
       res.status(200).json({ data: filterData, message: 'User posts retrieved successfully' });
     } catch (error) {
