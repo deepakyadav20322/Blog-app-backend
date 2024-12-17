@@ -1,9 +1,9 @@
 const express = require('express');
+const app = express();
 require('dotenv').config();
 const connectToDatabase = require('./db/connection')
 const cors = require('cors');
 const allUser = require('./db/userSchema')
-const app = express();
 
 
 const port = process.env.PORT ||4040; 

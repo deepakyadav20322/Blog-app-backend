@@ -1,6 +1,7 @@
 
 module.exports = (fname, lname, email,passwordToken) => {
-    const verificationLink = `http://localhost:5173/resetPassword/${passwordToken}`
+    // const verificationLink = `http://localhost:5173/resetPassword/${passwordToken}`
+    const verificationLink = `https://blog-app-frontend-pi.vercel.app/resetPassword/${passwordToken}`
     return(
         `<!DOCTYPE html>
         <html>
