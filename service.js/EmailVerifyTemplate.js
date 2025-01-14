@@ -1,6 +1,6 @@
 
 module.exports = (fname, lname, email,id) => {
-    const verificationLink = `http://localhost:5173/emailVerification/${id}` ;
+    const verificationLink = `${process.env.clientURL?'process.env.clientURL':'http://localhost:5173'}/emailVerification/${id}` ;
     return `
 <!DOCTYPE html>
 <html lang="en">
