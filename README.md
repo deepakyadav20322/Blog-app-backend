@@ -1,166 +1,159 @@
-[![Express Logo](https://i.cloudup.com/zfY6lL7eFa-3000x3000.png)](http://expressjs.com/)
+# BlogWrite Backend – Server Side
 
-  Fast, unopinionated, minimalist web framework for [Node.js](http://nodejs.org).
+Backend server for **BlogWrite**, a full-stack blog platform built with **Node.js, Express.js, MongoDB, and Socket.io**.
+This backend handles authentication, authorization, blog management, user interactions, admin controls, and real-time features.
 
-  [![NPM Version][npm-version-image]][npm-url]
-  [![NPM Install Size][npm-install-size-image]][npm-install-size-url]
-  [![NPM Downloads][npm-downloads-image]][npm-downloads-url]
+(Your current README is still the default Express template , so replacing it with this project-specific one will make your repo look much more professional.)
 
-```js
-const express = require('express')
-const app = express()
+---
 
-app.get('/', function (req, res) {
-  res.send('Hello World')
-})
+## 🚀 Features
 
-app.listen(3000)
+* Secure **Authentication & Authorization** using JWT
+* User registration and login system
+* Blog creation, editing, deletion, and management
+* Like, Comment, and Share functionality
+* Follow / Unfollow users
+* User and Admin dashboards support
+* Role-based access control
+* Real-time features using **Socket.io**
+* Optimized backend architecture for scalable performance
+
+---
+
+## 🛠 Tech Stack
+
+* Node.js
+* Express.js
+* MongoDB
+* Mongoose
+* JWT Authentication
+* Socket.io
+* Cloudinary (if used)
+* Multer (if used)
+* bcrypt.js
+* dotenv
+
+---
+
+## 🔗 Repository Link
+
+### Backend Repository
+
+Actual repo:
+https://github.com/deepakyadav20322/Blog-app-backend
+
+---
+
+## 📦 Installation
+
+### Clone the Repository
+
+```bash id="n9x6s1"
+git clone https://github.com/deepakyadav20322/Blog-app-backend.git
+cd Blog-app-backend
 ```
 
-## Installation
+---
 
-This is a [Node.js](https://nodejs.org/en/) module available through the
-[npm registry](https://www.npmjs.com/).
+## Install Dependencies
 
-Before installing, [download and install Node.js](https://nodejs.org/en/download/).
-Node.js 0.10 or higher is required.
-
-If this is a brand new project, make sure to create a `package.json` first with
-the [`npm init` command](https://docs.npmjs.com/creating-a-package-json-file).
-
-Installation is done using the
-[`npm install` command](https://docs.npmjs.com/getting-started/installing-npm-packages-locally):
-
-```console
-$ npm install express
+```bash id="j3f7k2"
+npm install
 ```
 
-Follow [our installing guide](http://expressjs.com/en/starter/installing.html)
-for more information.
+---
 
-## Features
+## Environment Variables
 
-  * Robust routing
-  * Focus on high performance
-  * Super-high test coverage
-  * HTTP helpers (redirection, caching, etc)
-  * View system supporting 14+ template engines
-  * Content negotiation
-  * Executable for generating applications quickly
+Create a `.env` file in the root folder:
 
-## Docs & Community
+```env id="v8p4m5"
+PORT=5000
+MONGO_URI=your_mongodb_connection_string
+JWT_SECRET=your_secret_key
+CLIENT_URL=your_frontend_url
+EMAIL = your_email_id
+EMAIL_APP_PASS = your_email_app_password
 
-  * [Website and Documentation](http://expressjs.com/) - [[website repo](https://github.com/expressjs/expressjs.com)]
-  * [#express](https://web.libera.chat/#express) on [Libera Chat](https://libera.chat) IRC
-  * [GitHub Organization](https://github.com/expressjs) for Official Middleware & Modules
-  * Visit the [Wiki](https://github.com/expressjs/express/wiki)
-  * [Google Group](https://groups.google.com/group/express-js) for discussion
-  * [Gitter](https://gitter.im/expressjs/express) for support and discussion
-
-**PROTIP** Be sure to read [Migrating from 3.x to 4.x](https://github.com/expressjs/express/wiki/Migrating-from-3.x-to-4.x) as well as [New features in 4.x](https://github.com/expressjs/express/wiki/New-features-in-4.x).
-
-## Quick Start
-
-  The quickest way to get started with express is to utilize the executable [`express(1)`](https://github.com/expressjs/generator) to generate an application as shown below:
-
-  Install the executable. The executable's major version will match Express's:
-
-```console
-$ npm install -g express-generator@4
 ```
 
-  Create the app:
+(Keep only the variables you actually use.)
 
-```console
-$ express /tmp/foo && cd /tmp/foo
+---
+
+## Run the Server
+
+### Development Mode
+
+```bash id="q2r8t4"
+npm run dev
 ```
 
-  Install dependencies:
+### Production Mode
 
-```console
-$ npm install
+```bash id="z7w1x9"
+npm start
 ```
 
-  Start the server:
+Server runs on:
 
-```console
-$ npm start
+```bash id="m5c8p2"
+http://localhost:5000
 ```
 
-  View the website at: http://localhost:3000
+---
 
-## Philosophy
+## API Highlights
 
-  The Express philosophy is to provide small, robust tooling for HTTP servers, making
-  it a great solution for single page applications, websites, hybrids, or public
-  HTTP APIs.
+### Authentication
 
-  Express does not force you to use any specific ORM or template engine. With support for over
-  14 template engines via [Consolidate.js](https://github.com/tj/consolidate.js),
-  you can quickly craft your perfect framework.
+* Register User
+* Login User
+* JWT Protected Routes
+* Profile
 
-## Examples
+### Blog Management
 
-  To view the examples, clone the Express repo and install the dependencies:
+* Create Blog
+* Update Blog
+* Delete Blog
+* Fetch Blogs
 
-```console
-$ git clone https://github.com/expressjs/express.git --depth 1
-$ cd express
-$ npm install
+### Social Features
+
+* Like / Unlike
+* Comment System
+* Follow / Unfollow Users
+
+### Admin Controls
+
+* User Management
+* Content Moderation
+* Dashboard Access
+
+---
+
+## 📁 Project Structure
+
+```text id="f6k3n7"
+controllers/
+models/
+routes/
+middleware/
+config/
+utils/
+server.js
+package.json
 ```
 
-  Then run whichever example you want:
+---
 
-```console
-$ node examples/content-negotiation
-```
+## 👨‍💻 Author
 
-## Contributing
+**Deepak Yadav**
 
-  [![Linux Build][github-actions-ci-image]][github-actions-ci-url]
-  [![Windows Build][appveyor-image]][appveyor-url]
-  [![Test Coverage][coveralls-image]][coveralls-url]
+* GitHub: https://github.com/deepakyadav20322
+---
 
-The Express.js project welcomes all constructive contributions. Contributions take many forms,
-from code for bug fixes and enhancements, to additions and fixes to documentation, additional
-tests, triaging incoming pull requests and issues, and more!
-
-See the [Contributing Guide](Contributing.md) for more technical details on contributing.
-
-### Security Issues
-
-If you discover a security vulnerability in Express, please see [Security Policies and Procedures](Security.md).
-
-### Running Tests
-
-To run the test suite, first install the dependencies, then run `npm test`:
-
-```console
-$ npm install
-$ npm test
-```
-
-## People
-
-The original author of Express is [TJ Holowaychuk](https://github.com/tj)
-
-The current lead maintainer is [Douglas Christopher Wilson](https://github.com/dougwilson)
-
-[List of all contributors](https://github.com/expressjs/express/graphs/contributors)
-
-## License
-
-  [MIT](LICENSE)
-
-[appveyor-image]: https://badgen.net/appveyor/ci/dougwilson/express/master?label=windows
-[appveyor-url]: https://ci.appveyor.com/project/dougwilson/express
-[coveralls-image]: https://badgen.net/coveralls/c/github/expressjs/express/master
-[coveralls-url]: https://coveralls.io/r/expressjs/express?branch=master
-[github-actions-ci-image]: https://badgen.net/github/checks/expressjs/express/master?label=linux
-[github-actions-ci-url]: https://github.com/expressjs/express/actions/workflows/ci.yml
-[npm-downloads-image]: https://badgen.net/npm/dm/express
-[npm-downloads-url]: https://npmcharts.com/compare/express?minimal=true
-[npm-install-size-image]: https://badgen.net/packagephobia/install/express
-[npm-install-size-url]: https://packagephobia.com/result?p=express
-[npm-url]: https://npmjs.org/package/express
-[npm-version-image]: https://badgen.net/npm/v/express
+If you found this project useful, feel free to ⭐ the repository.
